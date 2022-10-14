@@ -38,24 +38,23 @@ pipeline{
         }
         stage('indentifying misconfigs using datree in helm charts'){
             steps{
-                node('master'){
-                    script{
-
-                        dir('kubernetes/') {
-                           withEnv(['DATREE_TOKEN=8a021731-42c5-415d-abb4-93ec964e3b92']) {
-                                 sh 'helm datree test myapp/'
-                           }
-                          
+                script{
+                    dir('kubernetes/') {
+                        withEnv(['DATREE_TOKEN=8a021731-42c5-415d-abb4-93ec964e3b92']) {
+                              sh 'helm datree test myapp/'
                         }
-                    }
+                          
+                       }
                 }
-                
             }
+                
         }
+        
     }
     post {
 		always {
-			mail bcc: '', body: "<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "${currentBuild.result} CI: Project name -> ${env.JOB_NAME}", to: "shreyasshetty101@gmail.com";  
-		}
-	}
+			mail bcc: '', body: "<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "${currentBuild.result} CI: Project name -> ${env.JOB_NAME}", to: "deekshith.snsep@gmail.com";  
+		 }
+	   }
+    
 }
