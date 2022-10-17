@@ -72,14 +72,12 @@ pipeline{
             steps{
                 script{
                     dir('kubernetes/'){
-                        step([
-                        $class: 'KubernetesEngineBuilder',
-                        projectId: env.PROJECT_ID,
-                        clusterName: env.CLUSTER_NAME,
-                        location: env.LOCATION,
-                        credentialsId: env.CREDENTIALS_ID,
-                        verifyDeployments: true])
-                        sh 'helm upgrade --install --set image.repository="34.131.139.168:8083/springapp" --set image.tag="${VERSION}" myjavaapp myapp/ '
+                        sh ''' 
+                           gcloud container clusters get-credentials demo-cluster --zone asia-south2-a --project gcp-project-for-learning
+                           helm upgrade --install --set image.repository="34.131.139.168:8083/springapp" --set image.tag="${VERSION}" myjavaapp myapp/
+                           '''
+
+                        
                     }
                 }
             }
