@@ -2,6 +2,10 @@ pipeline{
     agent any 
     environment{
         VERSION = "${env.BUILD_ID}"
+        PROJECT_ID = 'gcp-project-for-learning'
+        CLUSTER_NAME = 'demo-cluster'
+        LOCATION = 'asia-south2-a'
+        CREDENTIALS_ID = 'gcp-project-for-learning'
     }
     stages{
         stage("sonar quality check"){
@@ -64,8 +68,24 @@ pipeline{
                 }
             }
         }
-        
+        stage('Deploy to GKE') {
+            steps{
+                script{
+                    dir('kubernetes/'){
+                        step([
+                        $class: 'KubernetesEngineBuilder',
+                        projectId: env.PROJECT_ID,
+                        clusterName: env.CLUSTER_NAME,
+                        location: env.LOCATION,
+                        credentialsId: env.CREDENTIALS_ID,
+                        verifyDeployments: true])
+                        sh 'helm upgrade --install --set image.repository="34.131.139.168:8083/springapp" --set image.tag="${VERSION}" myjavaapp myapp/ '
+                    }
+                }
+            }
+        }
     }
+        
     post {
 		always {
 			mail bcc: '', body: "<br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "${currentBuild.result} CI: Project name -> ${env.JOB_NAME}", to: "shreyasshetty101@gmail.com";  
